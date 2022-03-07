@@ -11,6 +11,7 @@ import re
 # with open('rangers_html.html', 'r') as file:
 #     html_code = file.read()
 
+
 r = requests.get(url='https://www.nhl.com/rangers/info/sounds-of-the-game').text
 
 soup = BeautifulSoup(r, 'html.parser')

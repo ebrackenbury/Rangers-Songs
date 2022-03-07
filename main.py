@@ -2,7 +2,6 @@ import scraper
 
 
 def main():
-    # stuff goes here
     pass
 
 
