@@ -5,8 +5,6 @@ import requests
 import pandas as pd
 from time import sleep
 
-# Get rid of pandas 'append' in line 26
-
 
 def main():
     requested_html = requests.get(url='https://www.nhl.com/rangers/info/sounds-of-the-game')
