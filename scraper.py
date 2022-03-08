@@ -44,10 +44,9 @@ def scrape_songs(url):
     songs_df['NaN_Check'] = (songs_df['Artist'].isnull()) & (songs_df['Title'].notnull())
 
     periods = []
+    period = ''
 
     for row in songs_df.itertuples():
-        period = ''
-
         # Check if 'NaN_Check' is True - these rows are periods (1st, 2nd, intermissions, etc)
         if row[3]:
             # Identify period by 'Track' column
