@@ -14,21 +14,22 @@ def main():
     games = get_games(html=requested_html)
     links = get_links(html=requested_html)
 
-    games_and_links_dict = {"Game": games,
-                            "Links": links}
+    games_and_links_dict = {'Game': games,
+                            'Link': links}
 
     games_and_links_df = pd.DataFrame(games_and_links_dict)
 
-    scraped_songs = pd.DataFrame(columns=['Title', 'Artist', 'Period'])
+    scraped_songs_df = pd.DataFrame(columns=['Title', 'Artist', 'Period', 'Game'], index=None)
 
     for link in links:
+        game = games_and_links_df.loc[games_and_links_df['Link'] == link, 'Game'].iloc[0]
         scraped_data = scrape_songs(url=link)
-        scraped_songs.append(scraped_data)
-        print(link)
+        scraped_data['Game'] = game
+        scraped_songs_df = pd.concat([scraped_songs_df, scraped_data])
 
-        sleep(5)
+        sleep(4)
 
-    scraped_songs.to_csv('full_data.csv')
+    scraped_songs_df.to_csv('full_data.csv')
 
 
 if __name__ == '__main__':
