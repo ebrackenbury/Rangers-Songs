@@ -1,28 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-import re
-
-# r = requests.get(url='https://www.nhl.com/rangers/fans/sounds-of-the-game-100418')
-
-# with open('rangers_html.html', 'w') as file:
-#     file.write(r.text)
-
-# with open('rangers_html.html', 'r') as file:
-#     html_code = file.read()
-
-
-requested_html = requests.get(url='https://www.nhl.com/rangers/info/sounds-of-the-game')
-
-# with open('rangers_games_html.html', 'w') as file:
-#     file.write(r.text)
-
-# with open('rangers_games_html.html', 'r') as file:
-#     html_code = file.read()
 
 
 def get_games(html):
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html.text, 'html.parser')
 
     html_games = soup.find_all('td')
 
@@ -37,7 +19,7 @@ def get_games(html):
 
 
 def get_links(html):
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html.text, 'html.parser')
 
     html_links = soup.find_all('a', string='Click for Playlist')
 
@@ -49,29 +31,33 @@ def get_links(html):
     return links_list
 
 
-games = get_games(requested_html)
-links = get_links(requested_html)
+def scrape_songs(url):
+    html = requests.get(url=url)
 
-games_dict = {"Game": games,
-              "Link": links}
+    soup = BeautifulSoup(html.text, 'html.parser')
 
-df = pd.DataFrame(data=games_dict)
-print(df)
+    songs = soup.find('table', class_='table-token__table stats_table')
 
-# df.to_csv("games.csv")
+    songs_df = pd.read_html(str(songs))[0]
+    songs_df.columns = ['Title', 'Artist']
 
-# df = pd.read_html(str(games))[0]['DATE']
+    songs_df['NaN_Check'] = (songs_df['Artist'].isnull()) & (songs_df['Title'].notnull())
 
-# print(df)
+    periods = []
 
-# def scrape_songs(url):
-#
-#     requested_html = requests.get(url=url)
-#
-#     soup = BeautifulSoup(requested_html, 'html.parser')
-#
-#     songs = soup.find('table', class_='table-token__table stats_table')
-#
-#     df = pd.read_html(str(songs))[0]
-#     df.columns = ['Title', 'Artist']
+    for row in songs_df.itertuples():
+        period = None
+        if row[3]:
+            period = row[1]
+            periods.append(period)
+        else:
+            periods.append(period)
+
+    songs_df['Period'] = periods
+    songs_df = songs_df.drop(['NaN_Check'], axis=1)
+    songs_df = songs_df[songs_df['Artist'].notnull()]
+
+    return songs_df
+
+
 
